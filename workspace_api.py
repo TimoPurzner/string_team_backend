@@ -75,10 +75,8 @@ def refresh_workspace(id):
     else:
         print("update old workspace")
         workspace.xml_id = workspace_info["xml_id"]
-        if workspace_info["occupied"]  == False and int(time.time())-int(workspace_info["last_change"])< 60*60:
-            workspace.occupied = False
-        else:
-            workspace.occupied = workspace_info["occupied"]
+        reserved_buffer_time_seconds = 15
+        workspace.occupied = workspace_info["occupied"]
         workspace.occupied_preliminary = workspace_info["occupied_preliminary"]
         workspace.latitude = workspace_info["latitude"]
         workspace.longitude = workspace_info["longitude"]
@@ -87,7 +85,10 @@ def refresh_workspace(id):
         workspace.ignored = workspace_info["ignored"]
         workspace.last_change = workspace_info["last_change"]
         workspace.last_contact = workspace_info["last_contact"]
-        workspace.reserved = workspace_info["reserved"]
+        if workspace_info["occupied"]  == False and int(time.time())-int(workspace_info["last_change"]) < reserved_buffer_time_seconds:
+            workspace.reserved = True
+        else:
+            workspace.reserved = workspace_info["reserved"]
         workspace.has_display = workspace_info["has_display"]
         workspace.parking_lot_id = workspace_info["parking_lot_id"]
     db.session.flush()
