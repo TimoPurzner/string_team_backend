@@ -22,8 +22,7 @@ def create_user():
 
     data = request.get_json()
 
-    new_user = User(id=data['id'], name=data['name'])
-    print(new_user)
+    new_user = User(id=data['id'], name=data['name'], psid=None, group='default')
     db.session.add(new_user)
     db.session.commit()
 
