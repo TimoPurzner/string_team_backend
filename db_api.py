@@ -13,6 +13,8 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50))
+    psid = db.Column(db.Integer)
+    group = db.Column(db.String(50))
 
 
 @app.route('/user', methods=['POST'])
