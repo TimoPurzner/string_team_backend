@@ -23,3 +23,18 @@ INSERT INTO groupname (id, group_name, valid_psid) VALUES (0, "default", "{'psid
 
 
 SELECT * FROM groupname;
+
+
+CREATE TABLE calendar(
+	reservation_id int PRIMARY KEY,
+	workspace_id int,
+	user_id int,
+	effective_from int,
+	effective_to int
+);
+
+
+INSERT INTO calendar (reservation_id, workspace_id, user_id, effective_from, effective_to) VALUES (2, 0, 0, 0, 1);
+
+
+SELECT * FROM calendar;
