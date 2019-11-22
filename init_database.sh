@@ -1,4 +1,4 @@
 #!/bin/bash
 
 rm database.db
-sqlite database.db < init_database.sql
+sqlite3 database.db < init_database.sql
