@@ -8,7 +8,7 @@ group_api = Blueprint('group_api', __name__)
 
 from api import db
 
-class GroupName(db.Model):
+class Groupname(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     group_name = db.Column(db.String(50))
@@ -20,7 +20,7 @@ def create_group():
 
     data = request.get_json()
 
-    new_group = GroupName(id=data['id'], group_name=data['name'], valid_psid=None)
+    new_group = Groupname(id=data['id'], group_name=data['name'], valid_psid=None)
     db.session.add(new_group)
     db.session.commit()
 
@@ -30,7 +30,7 @@ def create_group():
 @group_api.route('/group/<int:id>', methods=['DELETE'])
 def delete_group(id):
 
-    group = GroupName.query.filter_by(id=id).first()
+    group = Groupname.query.filter_by(id=id).first()
 
     if not group:
 
@@ -45,7 +45,7 @@ def delete_group(id):
 @group_api.route('/group/<int:id>/name', methods=['GET'])
 def get_group_name(id):
 
-    group = GroupName.query.filter_by(id=id).first()
+    group = Groupname.query.filter_by(id=id).first()
 
     if not group:
 
@@ -57,7 +57,7 @@ def get_group_name(id):
 @group_api.route('/group/<int:id>/name/<string:new_name>', methods=['PUT'])
 def set_group_name(id, new_name):
 
-    group = GroupName.query.filter_by(id=id).first()
+    group = Groupname.query.filter_by(id=id).first()
 
     if not group:
 
@@ -73,7 +73,7 @@ def set_group_name(id, new_name):
 @group_api.route('/group/<int:id>/valid_psid', methods=['GET'])
 def get_group_valid_psid(id):
 
-    group = GroupName.query.filter_by(id=id).first()
+    group = Groupname.query.filter_by(id=id).first()
 
     if not group:
 
@@ -85,7 +85,7 @@ def get_group_valid_psid(id):
 @group_api.route('/group/<int:id>/valid_psid/<string:new_psid>', methods=['PUT'])
 def set_group_valid_psid(id, new_psid):
 
-    group = GroupName.query.filter_by(id=id).first()
+    group = Groupname.query.filter_by(id=id).first()
 
     if not group:
 
@@ -101,7 +101,7 @@ def set_group_valid_psid(id, new_psid):
 @group_api.route('/group/<int:id>', methods=['GET'])
 def get_group_info(id):
 
-    group = GroupName.query.filter_by(id=id).first()
+    group = Groupname.query.filter_by(id=id).first()
 
     if not group:
 
@@ -113,13 +113,13 @@ def get_group_info(id):
     group_info['valid_psid']=group.valid_psid
 
 
-    return jsonify(group)
+    return jsonify(group_info)
 
 
 @group_api.route('/group/all', methods=['GET'])
 def get_all_groups():
 
-    groups = GroupName.query.all()
+    groups = Groupname.query.all()
 
     output = []
 
