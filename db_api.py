@@ -29,7 +29,7 @@ def create_user():
     return jsonify({'status':'new user created'})
 
 
-@app.route('/user/<id>', methods=['POST'])
+@app.route('/user/<int:id>', methods=['DELETE'])
 def delete_user(id):
 
     user = User.query.filter_by(id=id).first()
@@ -42,6 +42,36 @@ def delete_user(id):
     db.session.commit()
 
     return jsonify({'success':'user deleted'})
+
+
+@app.route('/user/<int:id>/name/<string:new_name>', methods=['PUT'])
+def change_user_name(id, new_name):
+
+    user = User.query.filter_by(id=id).first()
+
+    if not user:
+
+        return jsonify({'failure':'no user found'})
+
+    user.name = new_name
+    db.session.flush()
+    db.session.commit()
+
+    return jsonify({'success':'user name changed'})
+
+
+@app.route('/user/<int:id>/name', methods=['GET'])
+def get_user_name(id):
+
+    user = User.query.filter_by(id=id).first()
+
+    if not user:
+
+        return jsonify({'failure':'no user found'})
+
+    return jsonify({'name':user.name})
+
+    
 
 
 if __name__ == '__main__':
