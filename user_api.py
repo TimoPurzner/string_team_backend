@@ -51,7 +51,7 @@ def delete_user(id):
 
 
 @user_api.route('/user/<int:id>/name/<string:new_name>', methods=['PUT'])
-def change_user_name(id, new_name):
+def set_user_name(id, new_name):
 
     user = User.query.filter_by(id=id).first()
 
@@ -70,12 +70,37 @@ def change_user_name(id, new_name):
 def get_user_info(id):
 
     user = User.query.filter_by(id=id).first()
-
+    
     if not user:
 
         return jsonify({'failure':'no user found'})
 
-    return '1'
+    user_info = {}
+    user_info['id']=user.id
+    user_info['name']=user.name
+    user_info['psid']=user.psid
+    user_info['group']=user.group
+
+    return jsonify(user_info)
+
+
+@user_api.route('/user/all', methods=['GET'])
+def get_all_users():
+
+    users = User.query.all()
+
+    output = []
+
+    for user in users:
+        user_info = {}
+        user_info['id']=user.id
+        user_info['name']=user.name
+        user_info['psid']=user.psid
+        user_info['group']=user.group
+        output.append(user_info)
+
+    return jsonify({'users':output})
+
 
 @user_api.route('/user/<int:id>/name', methods=['GET'])
 def get_user_name(id):
@@ -87,6 +112,63 @@ def get_user_name(id):
         return jsonify({'failure':'no user found'})
 
     return jsonify({'name':user.name})
+
+
+@user_api.route('/user/<int:id>/psid', methods=['GET'])
+def get_user_psid(id):
+
+    user = User.query.filter_by(id=id).first()
+
+    if not user:
+
+        return jsonify({'failure':'no user found'})
+
+    return jsonify({'psid':user.psid})
+
+
+@user_api.route('/user/<int:id>/psid/<string:new_psid>', methods=['PUT'])
+def set_user_psid(id, new_psid):
+
+    user = User.query.filter_by(id=id).first()
+
+    if not user:
+
+        return jsonify({'failure':'no user found'})
+
+    user.psid = new_psid
+    db.session.flush()
+    db.session.commit()
+
+    return jsonify({'success':f'user psid changed to {user.psid}'})
+
+
+@user_api.route('/user/<int:id>/group', methods=['GET'])
+def get_user_group(id):
+
+    user = User.query.filter_by(id=id).first()
+
+    if not user:
+
+        return jsonify({'failure':'no user found'})
+
+    return jsonify({'group':user.group})
+
+
+@user_api.route('/user/<int:id>/group/<string:new_group>', methods=['PUT'])
+def set_user_group(id, new_group):
+
+    user = User.query.filter_by(id=id).first()
+
+    if not user:
+
+        return jsonify({'failure':'no user found'})
+
+    user.group = new_group
+    db.session.flush()
+    db.session.commit()
+
+    return jsonify({'success':f'user group changed to {user.group}'})
+
 
     
 
