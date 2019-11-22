@@ -10,10 +10,12 @@ db = SQLAlchemy(app)
 from user_api import user_api
 from group_api import group_api
 from calendar_api import calendar_api
+from workspace_api import workspace_api
 
 app.register_blueprint(user_api)
 app.register_blueprint(group_api)
 app.register_blueprint(calendar_api)
+app.register_blueprint(workspace_api)
 
 @app.route("/")
 def hello():
