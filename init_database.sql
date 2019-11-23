@@ -7,11 +7,11 @@ CREATE TABLE user(
 );
 
 
-INSERT INTO user (id, name, psid, group_name) VALUES (0, "Fred", 56308, "default");
-INSERT INTO user (id, name, psid, group_name) VALUES (1, "Timo", 61671, "default");
-INSERT INTO user (id, name, psid, group_name) VALUES (2, "Anne", 61720, "default");
-INSERT INTO user (id, name, psid, group_name) VALUES (3, "Fabian", 61718, "default");
-INSERT INTO user (id, name, psid, group_name) VALUES (4, "Pascal", 61719, "default");
+INSERT INTO user (id, name, psid, group_name) VALUES (0, "Fred", 56308, "all");
+INSERT INTO user (id, name, psid, group_name) VALUES (1, "Timo", 61671, "all");
+INSERT INTO user (id, name, psid, group_name) VALUES (2, "Anne", 61720, "all");
+INSERT INTO user (id, name, psid, group_name) VALUES (3, "Fabian", 61718, "all");
+INSERT INTO user (id, name, psid, group_name) VALUES (4, "Pascal", 61719, "all");
 
 SELECT * FROM user;
 
@@ -23,6 +23,7 @@ CREATE TABLE groupname(
 
 
 INSERT INTO groupname (id, group_name, valid_psid) VALUES (0, "default", "{'psids':[56308]}");
+INSERT INTO groupname (id, group_name, valid_psid) VALUES (1, "all", "{'psids':[56308, 61671, 56309, 61719, 61718, 61717, 61716, 61715, 61714, 61720]}");
 
 
 SELECT * FROM groupname;
@@ -36,8 +37,8 @@ CREATE TABLE calendar(
 	effective_to int
 );
 
--- from Sat, 23 Nov 2019 09:41:50 GMT till Sun, 24 Nov 2019 11:03:11 GMT
-INSERT INTO calendar (reservation_id, workspace_id, user_id, effective_from, effective_to) VALUES (0, 56308, 0, 1574502110, 1574593391);
+
+INSERT INTO calendar (reservation_id, workspace_id, user_id, effective_from, effective_to) VALUES (0, 56308, 0, 1574502110, 1574502710);
 
 
 SELECT * FROM calendar;
