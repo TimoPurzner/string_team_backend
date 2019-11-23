@@ -22,20 +22,36 @@ def create_reservation():
 
     data = request.get_json()
 
-    print(data)
+    # generate reservation_id
+    max_reservtion_id = db.session.query(Calendar.reservation_id).order_by(Calendar.reservation_id.desc()).first()[0]
 
-    new_reservation = Calendar(reservation_id=data['reservation_id'],
+    new_reservation = Calendar(reservation_id=max_reservtion_id+1,
                                 workspace_id=data['workspace_id'],
                                 user_id=data['user_id'],
                                 effective_from=data['effective_from'],
                                 effective_to=data['effective_to']
                                 )
 
-    print('workspace_id: ',new_reservation.workspace_id)
-
-    reservations = Calendar.query.filter_by(workspace_id=new_reservation.workspace_id)
+    # all reservations for this workspace
+    reservations = Calendar.query.filter(Calendar.workspace_id==new_reservation.workspace_id,
+    Calendar.effective_from<new_reservation.effective_to,
+    Calendar.effective_to>new_reservation.effective_from)
     #reservations = Calendar.query.all()
 
-    return jsonify({'success':'yeah'})
+    conflict_output = {}
+
+    for reservation in reservations:
+
+        conflict_output[reservation.reservation_id] = 'conflict with this reservation_id'
+
+    if len(conflict_output):
+
+        return jsonify(conflict_output)
+
+    # add new reservation
+    db.session.add(new_reservation)
+    db.session.commit()
+
+    return jsonify({'reservation_id':new_reservation.reservation_id})
 
     #print(reservations.workspace_id)
