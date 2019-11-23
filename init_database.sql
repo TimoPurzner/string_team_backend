@@ -7,8 +7,11 @@ CREATE TABLE user(
 );
 
 
-INSERT INTO user (id, name, psid, group_name) VALUES (0, "Fabian", 1337, "default");
-
+INSERT INTO user (id, name, psid, group_name) VALUES (0, "Fred", 56308, "default");
+INSERT INTO user (id, name, psid, group_name) VALUES (1, "Timo", 61671, "default");
+INSERT INTO user (id, name, psid, group_name) VALUES (2, "Anne", 61720, "default");
+INSERT INTO user (id, name, psid, group_name) VALUES (3, "Fabian", 61718, "default");
+INSERT INTO user (id, name, psid, group_name) VALUES (4, "Pascal", 61719, "default");
 
 SELECT * FROM user;
 
