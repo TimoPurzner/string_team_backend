@@ -34,11 +34,12 @@ CREATE TABLE calendar(
 	workspace_id int,
 	user_id int,
 	effective_from int,
-	effective_to int
+	effective_to int,
+    valid int
 );
 
 
-INSERT INTO calendar (reservation_id, workspace_id, user_id, effective_from, effective_to) VALUES (0, 56308, 0, 1574502110, 1574502710);
+INSERT INTO calendar (reservation_id, workspace_id, user_id, effective_from, effective_to, valid) VALUES (0, 56308, 0, 1574502110, 1574502710, 1);
 
 
 SELECT * FROM calendar;

@@ -15,6 +15,7 @@ class Calendar(db.Model):
     user_id = db.Column(db.Integer)
     effective_from = db.Column(db.Integer)
     effective_to = db.Column(db.Integer)
+    valid = db.Column(db.Integer)
 
 
 @calendar_api.route('/calendar', methods=['POST'])
@@ -29,13 +30,15 @@ def create_reservation():
                                 workspace_id=data['workspace_id'],
                                 user_id=data['user_id'],
                                 effective_from=data['effective_from'],
-                                effective_to=data['effective_to']
+                                effective_to=data['effective_to'],
+                                valid=1
                                 )
 
     # all reservations for this workspace
     reservations = Calendar.query.filter(Calendar.workspace_id==new_reservation.workspace_id,
     Calendar.effective_from<new_reservation.effective_to,
-    Calendar.effective_to>new_reservation.effective_from)
+    Calendar.effective_to>new_reservation.effective_from,
+    Calendar.valid==1)
 
     conflict_output = {}
 
@@ -131,6 +134,23 @@ def get_all_reservations():
         output_file['user_id'] = reservation.user_id
         output_file['effective_from'] = reservation.effective_from
         output_file['effective_to'] = reservation.effective_to
+        output_file['valid'] = reservation.valid
         output.append(output_file)
 
     return jsonify(output)
+
+
+@calendar_api.route('/calendar/valid/<int:reservation_id>/<int:valid>', methods=['PUT'])
+def set_reservation_valid(reservation_id, valid):
+
+    reservation = db.session.query(Calendar).filter(Calendar.reservation_id==reservation_id).first()
+
+    if not reservation:
+
+        return jsonify({'failure':'no reservation found'})
+
+    reservation.valid = valid
+    db.session.flush()
+    db.session.commit()
+
+    return jsonify({'valid':reservation.valid})
