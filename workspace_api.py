@@ -55,7 +55,7 @@ def is_workspace_reserved_with_calendar(workspace_info):
 
     # Reservation validation
     for reservation in reservations:
-        reservation_time = reservation["effective_from"] <= workspace_info["last_change"] and workspace_info["last_change"] <= reservation["effective_from"]+ reservation_buffer_time
+        reservation_time = workspace_info["last_change"] <= reservation["effective_from"]+ reservation_buffer_time
         reservation_current = reservation["effective_from"] <= current_time and current_time <= reservation["effective_from"]+ reservation_buffer_time
         print("reservation_id:"+str(reservation["reservation_id"])+" last_change:" + str(reservation_time) + " current:" + str(reservation_current))        
         str_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(reservation["effective_from"]+ reservation_buffer_time))
