@@ -60,3 +60,18 @@ CREATE TABLE workspace (
             parking_lot_id int,
             workspace_name char(50)
 );
+
+INSERT INTO workspace(id,xml_id,occupied,occupied_preliminary,latitude,longitude,level,ignored,last_change,last_contact,reserved,has_display,parking_lot_id,workspace_name) VALUES 
+(56308, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "Pikochu"),
+(61671, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "Bisasom"),
+(56309, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "Schiggo"),
+(61719, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "Glumonda"),
+(61718, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "Zeptos"),
+(61717, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "Arktus"),
+(61716, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "Moew"),
+(61715, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "MoewThree"),
+(61714, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "Lovados"),
+(61720, 0, false, false, 0, 0, 0, false, 0, 0, false, false, 0, "Evali");
+
+
+SELECT * FROM workspace;
