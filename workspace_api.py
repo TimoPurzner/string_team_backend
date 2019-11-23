@@ -2,6 +2,7 @@ from flask import Flask
 from flask import jsonify
 from flask import Blueprint
 from flask_sqlalchemy import SQLAlchemy
+from calendar_api import get_workspace_reservations
 import requests
 import json
 import time
@@ -29,7 +30,6 @@ class Workspace(db.Model):
     # our own Attributes
     workspace_name = db.Column(db.String(50))
 
-
 @workspace_api.route('/workspace/<int:id>/name/<string:new_name>', methods=['PUT'])
 def change_workspace_name(id, new_name):
 
@@ -44,18 +44,53 @@ def change_workspace_name(id, new_name):
 
     return jsonify({'success':'workspace name changed'})
 
+def is_workspace_reserved_with_calendar(workspace_info):
+    reserved = False
+    reservations = json.loads(get_workspace_reservations(workspace_info["id"]).get_data(as_text=True))
+    current_time = int(time.time())
+    reservation_buffer_time = 60*10
+
+    for reservation in reservations:
+        reservation_time = reservation["effective_from"] <= current_time and current_time <= reservation["effective_to"]
+        reservation_valid = reservation["effective_from"] + reservation_buffer_time >= workspace_info["last_change"]
+        print("workspace[id="+str(workspace_info["id"])+"] calendar: " + str(reservation_time) + " valid: " + str(reservation_valid))
+        if reservation_time and reservation_valid:
+            reserved = True
+    return reserved
+            
+
 def dict_to_workspace(workspace_info):
     id = workspace_info["id"]
     workspace = Workspace.query.filter_by(id=id).first()
     last_contact = 0
     if "last_contact" in workspace_info:
         last_contact = workspace_info["last_contact"]
+
+    
+    reserved_buffer_time_seconds = 15
+    reserved = False
+    # Checke Parkuhr System
+    if workspace_info["occupied"]  == False and int(time.time())-int(workspace_info["last_change"]) < reserved_buffer_time_seconds:
+        reserved = True
+    # Checke ob Arbeitsplatz vom Kalender aus reserviert ist
+    elif is_workspace_reserved_with_calendar(workspace_info):
+        reserved = True
+    else:
+        reserved = workspace_info["reserved"]
+
+    occupied = workspace_info["occupied"]
+    # http://127.0.0.1:5000/workspace/61671
+    hard_coded_occupied_workspace_ids = [61671, 61720, 61718, 61719]
+    for hard_code_id in hard_coded_occupied_workspace_ids:
+        if hard_code_id == id:
+            occupied = True
+
     if not workspace:
         print("create new workspace[id='"+str(id)+"']")
         workspace = Workspace(
             id=workspace_info["id"],
             xml_id = workspace_info["xml_id"],
-            occupied = workspace_info["occupied"],
+            occupied = occupied,
             occupied_preliminary = workspace_info["occupied_preliminary"],
             latitude = workspace_info["latitude"],
             longitude = workspace_info["longitude"],
@@ -63,7 +98,7 @@ def dict_to_workspace(workspace_info):
             ignored = workspace_info["ignored"],
             last_change = workspace_info["last_change"],
             last_contact = last_contact,
-            reserved = workspace_info["reserved"],
+            reserved = reserved,
             has_display = workspace_info["has_display"],
             parking_lot_id = workspace_info["parking_lot_id"],
             workspace_name = "not defined"
@@ -73,8 +108,7 @@ def dict_to_workspace(workspace_info):
     else:
         print("update old workspace[id='"+str(id)+"']")
         workspace.xml_id = workspace_info["xml_id"]
-        reserved_buffer_time_seconds = 15
-        workspace.occupied = workspace_info["occupied"]
+        workspace.occupied = occupied
         workspace.occupied_preliminary = workspace_info["occupied_preliminary"]
         workspace.latitude = workspace_info["latitude"]
         workspace.longitude = workspace_info["longitude"]
@@ -83,10 +117,7 @@ def dict_to_workspace(workspace_info):
         workspace.ignored = workspace_info["ignored"]
         workspace.last_change = workspace_info["last_change"]
         workspace.last_contact = last_contact
-        if workspace_info["occupied"]  == False and int(time.time())-int(workspace_info["last_change"]) < reserved_buffer_time_seconds:
-            workspace.reserved = True
-        else:
-            workspace.reserved = workspace_info["reserved"]
+        workspace.reserved = reserved
         workspace.has_display = workspace_info["has_display"]
         workspace.parking_lot_id = workspace_info["parking_lot_id"]
     db.session.flush()
@@ -120,7 +151,7 @@ def workspace_to_dic(workspace):
 
     return workspace_info
 
-
+# http://127.0.0.1:5000/workspace/56308
 @workspace_api.route('/workspace/<int:id>', methods=['GET'])
 def get_workspace_info(id):
     refresh_workspace(id)
