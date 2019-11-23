@@ -2,6 +2,7 @@ from flask import Flask
 from flask import jsonify
 from flask import Blueprint
 from flask_sqlalchemy import SQLAlchemy
+import user_api
 from calendar_api import get_workspace_reservations
 import requests
 import json
@@ -52,7 +53,7 @@ def is_workspace_reserved_with_calendar(workspace_info):
 
     for reservation in reservations:
         reservation_time = reservation["effective_from"] <= current_time and current_time <= reservation["effective_to"]
-        reservation_valid = reservation["effective_from"] + reservation_buffer_time >= workspace_info["last_change"]
+        reservation_valid = reservation["effective_from"] + reservation_buffer_time >= current_time
         print("workspace[id="+str(workspace_info["id"])+"] calendar: " + str(reservation_time) + " valid: " + str(reservation_valid))
         if reservation_time and reservation_valid:
             reserved = True
@@ -127,7 +128,7 @@ def refresh_workspace(id):
     url="https://api.parking-pilot.com/parkingspaces/"+str(id)+"?api_key=HUK_Team4"
     print(url)
     answer=requests.get(url=url).text
-    print("############# respnse #############\n"+answer)
+    print("############# response #############\n"+answer)
     workspace_info = json.loads(answer)
     dict_to_workspace(workspace_info)
 
