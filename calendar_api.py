@@ -36,7 +36,6 @@ def create_reservation():
     reservations = Calendar.query.filter(Calendar.workspace_id==new_reservation.workspace_id,
     Calendar.effective_from<new_reservation.effective_to,
     Calendar.effective_to>new_reservation.effective_from)
-    #reservations = Calendar.query.all()
 
     conflict_output = {}
 
@@ -55,3 +54,83 @@ def create_reservation():
     return jsonify({'reservation_id':new_reservation.reservation_id})
 
     #print(reservations.workspace_id)
+
+
+@calendar_api.route('/calendar/user/<int:user_id>', methods=['GET'])
+def get_user_reservations(user_id):
+
+    reservations = db.session.query(Calendar).filter(Calendar.user_id==user_id)
+
+    output = []
+
+    for reservation in reservations:
+
+        output_file = {}
+        output_file['reservation_id'] = reservation.reservation_id
+        output_file['workspace_id'] = reservation.workspace_id
+        output_file['user_id'] = reservation.user_id
+        output_file['effective_from'] = reservation.effective_from
+        output_file['effective_to'] = reservation.effective_to
+        output.append(output_file)
+
+    return jsonify(output)
+
+
+@calendar_api.route('/calendar/workspace/<int:workspace_id>', methods=['GET'])
+def get_workspace_reservations(workspace_id):
+
+    reservations = db.session.query(Calendar).filter(Calendar.workspace_id==workspace_id)
+
+    output = []
+
+    for reservation in reservations:
+
+        output_file = {}
+        output_file['reservation_id'] = reservation.reservation_id
+        output_file['workspace_id'] = reservation.workspace_id
+        output_file['user_id'] = reservation.user_id
+        output_file['effective_from'] = reservation.effective_from
+        output_file['effective_to'] = reservation.effective_to
+        output.append(output_file)
+
+    return jsonify(output)
+
+
+@calendar_api.route('/calendar/reservation/<int:reservation_id>', methods=['GET'])
+def get_reservations(reservation_id):
+
+    reservations = db.session.query(Calendar).filter(Calendar.reservation_id==reservation_id)
+
+    output = []
+
+    for reservation in reservations:
+
+        output_file = {}
+        output_file['reservation_id'] = reservation.reservation_id
+        output_file['workspace_id'] = reservation.workspace_id
+        output_file['user_id'] = reservation.user_id
+        output_file['effective_from'] = reservation.effective_from
+        output_file['effective_to'] = reservation.effective_to
+        output.append(output_file)
+
+    return jsonify(output)
+
+
+@calendar_api.route('/calendar/reservation/all', methods=['GET'])
+def get_all_reservations():
+
+    reservations = db.session.query(Calendar).all()
+
+    output = []
+
+    for reservation in reservations:
+
+        output_file = {}
+        output_file['reservation_id'] = reservation.reservation_id
+        output_file['workspace_id'] = reservation.workspace_id
+        output_file['user_id'] = reservation.user_id
+        output_file['effective_from'] = reservation.effective_from
+        output_file['effective_to'] = reservation.effective_to
+        output.append(output_file)
+
+    return jsonify(output)
