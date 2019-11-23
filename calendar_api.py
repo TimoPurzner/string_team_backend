@@ -22,6 +22,7 @@ class Calendar(db.Model):
 def create_reservation():
 
     data = request.get_json()
+    print(data)
 
     # generate reservation_id
     max_reservtion_id = db.session.query(Calendar.reservation_id).order_by(Calendar.reservation_id.desc()).first()[0]
