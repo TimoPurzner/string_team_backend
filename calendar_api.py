@@ -94,6 +94,7 @@ def get_workspace_reservations(workspace_id):
         output_file['user_id'] = reservation.user_id
         output_file['effective_from'] = reservation.effective_from
         output_file['effective_to'] = reservation.effective_to
+        output_file['valid'] = reservation.valid
         output.append(output_file)
 
     return jsonify(output)
