@@ -44,16 +44,14 @@ def change_workspace_name(id, new_name):
 
     return jsonify({'success':'workspace name changed'})
 
-def refresh_workspace(id):
-
-    url="https://api.parking-pilot.com/parkingspaces/"+str(id)+"?api_key=HUK_Team4"
-    print(url)
-    answer=requests.get(url=url).text
-    print("############# respnse #############\n"+answer)
-    workspace_info = json.loads(answer)
+def dict_to_workspace(workspace_info):
+    id = workspace_info["id"]
     workspace = Workspace.query.filter_by(id=id).first()
+    last_contact = 0
+    if "last_contact" in workspace_info:
+        last_contact = workspace_info["last_contact"]
     if not workspace:
-        print("create new workspace")
+        print("create new workspace[id='"+str(id)+"']")
         workspace = Workspace(
             id=workspace_info["id"],
             xml_id = workspace_info["xml_id"],
@@ -64,7 +62,7 @@ def refresh_workspace(id):
             level = workspace_info["level"],
             ignored = workspace_info["ignored"],
             last_change = workspace_info["last_change"],
-            last_contact = workspace_info["last_contact"],
+            last_contact = last_contact,
             reserved = workspace_info["reserved"],
             has_display = workspace_info["has_display"],
             parking_lot_id = workspace_info["parking_lot_id"],
@@ -73,7 +71,7 @@ def refresh_workspace(id):
         db.session.add(workspace)
         db.session.commit()
     else:
-        print("update old workspace")
+        print("update old workspace[id='"+str(id)+"']")
         workspace.xml_id = workspace_info["xml_id"]
         reserved_buffer_time_seconds = 15
         workspace.occupied = workspace_info["occupied"]
@@ -84,7 +82,7 @@ def refresh_workspace(id):
         #additional_info
         workspace.ignored = workspace_info["ignored"]
         workspace.last_change = workspace_info["last_change"]
-        workspace.last_contact = workspace_info["last_contact"]
+        workspace.last_contact = last_contact
         if workspace_info["occupied"]  == False and int(time.time())-int(workspace_info["last_change"]) < reserved_buffer_time_seconds:
             workspace.reserved = True
         else:
@@ -94,13 +92,15 @@ def refresh_workspace(id):
     db.session.flush()
     db.session.commit()
 
-@workspace_api.route('/workspace/<int:id>', methods=['GET'])
-def get_workspace_info(id):
-    refresh_workspace(id)
-    workspace = Workspace.query.filter_by(id=id).first()
-    if not workspace:
-        return jsonify({'failure':'no workspace found'})
+def refresh_workspace(id):
+    url="https://api.parking-pilot.com/parkingspaces/"+str(id)+"?api_key=HUK_Team4"
+    print(url)
+    answer=requests.get(url=url).text
+    print("############# respnse #############\n"+answer)
+    workspace_info = json.loads(answer)
+    dict_to_workspace(workspace_info)
 
+def workspace_to_dic(workspace):
     workspace_info = {}
     workspace_info["id"] = workspace.id
     workspace_info["xml_id"] = workspace.xml_id
@@ -118,4 +118,36 @@ def get_workspace_info(id):
     workspace_info["parking_lot_id"] = workspace.parking_lot_id
     workspace_info["workspace_name"] = workspace.workspace_name
 
+    return workspace_info
+
+
+@workspace_api.route('/workspace/<int:id>', methods=['GET'])
+def get_workspace_info(id):
+    refresh_workspace(id)
+    workspace = Workspace.query.filter_by(id=id).first()
+    if not workspace:
+        return jsonify({'failure':'no workspace found'})
+
+    workspace_info = workspace_to_dic(workspace)
+
     return jsonify(workspace_info)
+
+def refresh_all_workspaces():
+    url="https://api.parking-pilot.com/parkinglots/1778/parkingspaces?api_key=HUK_Team4"
+    print(url)
+    answer=requests.get(url=url).text
+    workspaces_info = json.loads(answer)
+    for workspace_info in workspaces_info:
+        dict_to_workspace(workspace_info)
+
+@workspace_api.route('/workspace/all', methods=['GET'])
+def get_all_workspaces():
+    refresh_all_workspaces()
+    workspaces = Workspace.query.all()
+    output = []
+
+    for workspace in workspaces:
+        workspace_info = workspace_to_dic(workspace)
+        output.append(workspace_info)
+
+    return jsonify({'workspaces':output})
