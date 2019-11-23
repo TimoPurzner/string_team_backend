@@ -81,7 +81,10 @@ def set_group_name(id, new_name):
 
     return jsonify({'success':f'group name changed to {group.group_name}'})
 
-
+# Liefert eine Liste an gueltigen psids als JSON-String-List zurueck fuer die die Gruppe
+# Berechtigungen hat.
+#	return JSON-String failure wenn Gruppe nicht gefunden
+#	return JSON-String-List psids
 @group_api.route('/group/<int:id>/valid_psid', methods=['GET'])
 def get_group_valid_psid(id):
 
@@ -93,7 +96,9 @@ def get_group_valid_psid(id):
 
     return jsonify({'group':group.valid_psid})
 
-
+# Setzt die Gueltigen Arbeitsplaetze psids der Gruppe.
+#	return JSON-String failure wenn Gruppe nicht gefunden
+#	return JSON-String success bei Erfolg
 @group_api.route('/group/<int:id>/valid_psid/<string:new_psid>', methods=['PUT'])
 def set_group_valid_psid(id, new_psid):
 
@@ -109,7 +114,8 @@ def set_group_valid_psid(id, new_psid):
 
     return jsonify({'success':f'group valid_psid changed to {group.valid_psid}'})
 
-
+# Liefer die Gruppe mit der ID id als JSON-String zurueck
+#	return JSON-String
 @group_api.route('/group/<int:id>', methods=['GET'])
 def get_group_info(id):
 
@@ -127,7 +133,8 @@ def get_group_info(id):
 
     return jsonify(group_info)
 
-
+# Liefert alle Gruppen als JSON-String-List zurueck
+#	return JSON-String-List
 @group_api.route('/group/all', methods=['GET'])
 def get_all_groups():
 
