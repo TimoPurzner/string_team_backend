@@ -42,7 +42,7 @@ CREATE TABLE calendar(
 INSERT INTO calendar (reservation_id, workspace_id, user_id, effective_from, effective_to, valid) 
 VALUES 
 (0, 56308, 0, 1574502110, 1574502140, 1),
-(1, 56308, 0, 1574518546, 1574593391, 1);
+(1, 56308, 0, 1574519407, 1574593391, 1);
 
 
 SELECT * FROM calendar;
