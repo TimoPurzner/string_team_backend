@@ -55,7 +55,7 @@ def is_workspace_reserved_with_calendar(workspace_info):
         reservation_time = reservation["effective_from"] <= current_time and current_time <= reservation["effective_to"]
         reservation_valid = reservation["effective_from"] + reservation_buffer_time >= current_time
         print("workspace[id="+str(workspace_info["id"])+"] calendar: " + str(reservation_time) + " valid: " + str(reservation_valid))
-        if reservation_time and reservation_valid:
+        if reservation_time or reservation_valid:
             reserved = True
     return reserved
             
