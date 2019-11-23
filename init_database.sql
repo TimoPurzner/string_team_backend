@@ -44,18 +44,18 @@ INSERT INTO calendar (reservation_id, workspace_id, user_id, effective_from, eff
 SELECT * FROM calendar;
 
 CREATE TABLE workspace (
-            id,
-            xml_id,
-            occupied,
-            occupied_preliminary,
-            latitude,
-            longitude,
-            level,
-            ignored,
-            last_change,
-            last_contact,
-            reserved,
-            has_display,
-            parking_lot_id,
-            workspace_name
+            id int PRIMARY KEY,
+            xml_id int,
+            occupied bool,
+            occupied_preliminary bool,
+            latitude int,
+            longitude int,
+            level int,
+            ignored bool,
+            last_change int,
+            last_contact int,
+            reserved bool,
+            has_display bool,
+            parking_lot_id int,
+            workspace_name char(50)
 );
