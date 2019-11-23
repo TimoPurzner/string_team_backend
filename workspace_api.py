@@ -4,6 +4,7 @@ from flask import Blueprint
 from flask_sqlalchemy import SQLAlchemy
 import user_api
 from calendar_api import get_workspace_reservations
+from calendar_api import set_reservation_valid
 import requests
 import json
 import time
@@ -48,14 +49,15 @@ def change_workspace_name(id, new_name):
 def is_workspace_reserved_with_calendar(workspace_info):
     reserved = False
     reservations = json.loads(get_workspace_reservations(workspace_info["id"]).get_data(as_text=True))
+    print(reservations)
     current_time = int(time.time())
     reservation_buffer_time = 60*10
 
+    # Reservation validation
     for reservation in reservations:
-        reservation_time = reservation["effective_from"] <= current_time and current_time <= reservation["effective_to"]
-        reservation_valid = reservation["effective_from"] + reservation_buffer_time >= current_time
-        print("workspace[id="+str(workspace_info["id"])+"] calendar: " + str(reservation_time) + " valid: " + str(reservation_valid))
-        if reservation_time and reservation_valid:
+        reservation_time = reservation["effective_from"] <= workspace_info["last_change"] and workspace_info["last_change"] <= reservation["effective_to"]+ reservation_buffer_time
+        reservation_current = reservation["effective_from"] <= current_time and current_time <= reservation["effective_to"]+ reservation_buffer_time
+        if reservation_time or reservation_current:
             reserved = True
     return reserved
             
