@@ -13,6 +13,19 @@ workspace_api = Blueprint('workspace_api', __name__)
 
 from api import db
 
+# Workspace spiegelt die Arbeitsplaetze wieder, die man ueber die Platform reservieren kann. 
+#	id: 			ist eine eineindeutige ID des Arbeitsplatzes
+#	xml_id: 		ist eine eindeutige ID innerhalb eines Bereiches der Arbeitsplaetze enthaelt
+#	occupied: 		gibt an ob der Platz gerade besetzt ist
+#	occupied_preliminary: 	ist ein voruebergehendes besetzen zur Validierung
+#	latitude und longitude: sind GPS Koordinaten
+#	level:			Stockwerk auf dem sich der Platz befindet
+#	ignored: 		ob dieser Angezeigt werden soll oder nicht
+#	last_change: 		wann sich zuletzt jemand auf den Platz registriert hat
+#	reserved: 		gibt wieder ob der Platz reserviert ist
+#	has_display: 		ob der Platz ueber ein Display verfuegt
+#	parking_lot_id: 	ID des Bereichs dem der Arbeitsplatz zugeordnet ist
+#	workspace_name:		Name des Arbeitsplatzes
 class Workspace(db.Model):
     # Attributes from extern api
     id = db.Column(db.Integer, primary_key=True)
@@ -32,6 +45,10 @@ class Workspace(db.Model):
     # our own Attributes
     workspace_name = db.Column(db.String(50))
 
+# Diese methode aendert den Namen des Arbeitsplatzes. Hierzu wird der neue Name in die
+# Datenbank des dazugehoerigen Eintrags eingetragen.
+#	return json "success" bei Erfolg
+#	return json "failure" wenn kein Arbeitsplatz mit der ID id gefunden wurde
 @workspace_api.route('/workspace/<int:id>/name/<string:new_name>', methods=['PUT'])
 def change_workspace_name(id, new_name):
 
@@ -46,6 +63,11 @@ def change_workspace_name(id, new_name):
 
     return jsonify({'success':'workspace name changed'})
 
+# Diese Methode erwartet ein Workspace Dictionary workspace_info. Sie ueberprueft im Kalender
+# ob der Arbeitsplatz reserviert ist oder nicht. Weiterhin ueberprueft sie die Gueltigkeit von
+# Reservierungen und setzt diesen, wenn der Platz nicht in der vorgegebenen Zeit occupied wurde.
+#	return True wenn Arbeitsplatz besetzt
+#	return False wenn Arbeitsplatz nicht im Kalender reserviert
 def is_workspace_reserved_with_calendar(workspace_info):
     reserved = False
     reservations = json.loads(get_workspace_reservations(workspace_info["id"]).get_data(as_text=True))
@@ -67,7 +89,9 @@ def is_workspace_reserved_with_calendar(workspace_info):
             print("reservation_id:"+str(reservation["reservation_id"]) + str(set_status))
     return reserved
             
-
+# Speichert ein Workspace Dictionary in der Datenbank ab. Weiterhin aktuallisiert diese Methode den
+# Status und Values der Arbeitsplaetze in der Server eigenen Datenbank. Sollte der uebergebene
+# Arbeitsplatz noch nicht in der Datenbank existierten, wird dieser erzeugt.
 def dict_to_workspace(workspace_info):
     id = workspace_info["id"]
     workspace = Workspace.query.filter_by(id=id).first()
@@ -132,6 +156,9 @@ def dict_to_workspace(workspace_info):
     db.session.flush()
     db.session.commit()
 
+# Ruft die aktuellen Daten eines Arbeitsplatzes der Parking-Pilot API ueber einen
+# GET-Request ab und speichert/updated die abgerufenden Daten ueber die Methode 
+# dict_to_workspace in der Server eingenen Datenbank ab.
 def refresh_workspace(id):
     url="https://api.parking-pilot.com/parkingspaces/"+str(id)+"?api_key=HUK_Team4"
     print(url)
@@ -140,6 +167,8 @@ def refresh_workspace(id):
     workspace_info = json.loads(answer)
     dict_to_workspace(workspace_info)
 
+# Wandelt ein Workspace Objekt in ein Workspace Dictionary um
+#	return Workspace Dictionary
 def workspace_to_dic(workspace):
     workspace_info = {}
     workspace_info["id"] = workspace.id
@@ -160,7 +189,10 @@ def workspace_to_dic(workspace):
 
     return workspace_info
 
-# http://127.0.0.1:5000/workspace/56308
+
+# Liefert die Aktuellen Daten eines Arbeitsplatzes als JSON-String zurueck.
+# 	Beispiel URL: http://127.0.0.1:5000/workspace/56308
+#	return JSON-String
 @workspace_api.route('/workspace/<int:id>', methods=['GET'])
 def get_workspace_info(id):
     refresh_workspace(id)
@@ -172,6 +204,8 @@ def get_workspace_info(id):
 
     return jsonify(workspace_info)
 
+# Updated alle Arbeitsplaetze mit ueber die Parking-Pilot API. und speichert diese
+# in die Server eigene Datenbank ab.
 def refresh_all_workspaces():
     url="https://api.parking-pilot.com/parkinglots/1778/parkingspaces?api_key=HUK_Team4"
     print(url)
@@ -180,6 +214,8 @@ def refresh_all_workspaces():
     for workspace_info in workspaces_info:
         dict_to_workspace(workspace_info)
 
+# Liefert alle Arbeitsplaetze als JSON-String zurueck.
+#	return JSON-String
 @workspace_api.route('/workspace/all', methods=['GET'])
 def get_all_workspaces():
     refresh_all_workspaces()

@@ -8,6 +8,10 @@ group_api = Blueprint('group_api', __name__)
 
 from api import db
 
+# Die Klasse Groupname enthaehlt die Zugriffsrechte der Gruppen
+#	id:		eineindeutige ID der Gruppe
+#	group_name:	Name der Gruppe
+#	valid_psid:	Liste von psids die Mitglieder der Gruppe nutzen koennen
 class Groupname(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -15,6 +19,8 @@ class Groupname(db.Model):
     valid_psid = db.Column(db.String())
 
 
+# Erstellt eine neue Gruppe und speichert diese in der Datenbank des Servers ab.
+#	return JSON-String status
 @group_api.route('/group', methods=['POST'])
 def create_group():
 
@@ -26,7 +32,9 @@ def create_group():
 
     return jsonify({'status':'new group created'})
 
-
+# Loescht eine Gruppe mit der ID id aus der Datenbank.
+#	return JSON-String failure wenn Gruppe nicht gefunden wurde
+#	return JSON-String success bei Erfolg
 @group_api.route('/group/<int:id>', methods=['DELETE'])
 def delete_group(id):
 
@@ -41,7 +49,9 @@ def delete_group(id):
 
     return jsonify({'success':'group deleted'})
 
-
+# Gibt den Namen der Gruppe mit der ID id als JSON-String zurueck.
+#	return JSON-String failure wenn Gruppe nicht gefunden wurde
+#	return JSON-String group_name bei Erfolg
 @group_api.route('/group/<int:id>/name', methods=['GET'])
 def get_group_name(id):
 
@@ -53,7 +63,9 @@ def get_group_name(id):
 
     return jsonify({'group':group.group_name})
 
-
+# Setzt den Namen new_name der Gruppe mit der ID id und speichert diesen in der Datenbank ab.
+#	return JSON-String failure wenn Gruppe nicht funden wurde
+#	return JSON-String success bei Erfolg
 @group_api.route('/group/<int:id>/name/<string:new_name>', methods=['PUT'])
 def set_group_name(id, new_name):
 

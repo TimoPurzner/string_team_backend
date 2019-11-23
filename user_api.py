@@ -15,6 +15,11 @@ user_api = Blueprint('user_api', __name__)
 
 from api import db
 
+# Die Klasse User beinhaltet die Daten eines User der einen Arbeitsplatz reservieren kann.
+#	id:		eineindeutige ID des Users
+#	name:		Name des Users
+#	psid:		ID des aktuellen Arbeitsplatzes den er besetzt
+#	group_name:	JSON-String-List an Gruppennamen denen der User zugeordnet ist
 class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -23,6 +28,8 @@ class User(db.Model):
     group_name = db.Column(db.String(50))
 
 
+# Speicher einen neues User in der lokalen Datenbank des Servers ab.
+#	return JSON-String message bei Erfolg
 @user_api.route('/user', methods=['POST'])
 def create_user():
 
@@ -34,7 +41,9 @@ def create_user():
 
     return jsonify({'status':'new user created'})
 
-
+# Entfernt einen User aus der lokalen Datenbank des Servers.
+#	return JSON-String failure wenn User mit id nicht gefunden
+#	return JSON-Strinf success wenn User erflogreich aus der Datenbank geloescht
 @user_api.route('/user/<int:id>', methods=['DELETE'])
 def delete_user(id):
 
@@ -49,7 +58,9 @@ def delete_user(id):
 
     return jsonify({'success':'user deleted'})
 
-
+# Setzt den Namen new_name des Users mit der ID id in der Datenbank.
+#	return JSON-String failure wenn User mit id nicht gefunden
+#	return JSON-Strinf success wenn der Name geaendert wurde
 @user_api.route('/user/<int:id>/name/<string:new_name>', methods=['PUT'])
 def set_user_name(id, new_name):
 
@@ -66,6 +77,9 @@ def set_user_name(id, new_name):
     return jsonify({'success':'user name changed'})
 
 
+# Liefert die Informationen eines Users mit der ID id als JSON-String zurueck.
+#	return JSON-String failure wenn User nicht gefunden
+#	return JSON-String User wenn erfolgreich
 @user_api.route('/user/<int:id>', methods=['GET'])
 def get_user_info(id):
 
@@ -83,7 +97,8 @@ def get_user_info(id):
 
     return jsonify(user_info)
 
-
+# Liefert alle User als JSON-String-List zurueck.
+#	return JSON-String-List
 @user_api.route('/user/all', methods=['GET'])
 def get_all_users():
 
@@ -101,7 +116,9 @@ def get_all_users():
 
     return jsonify({'users':output})
 
-
+# Liefert den Namen des Users mit der ID id als JSON-String zurueck.
+#	return JSON-String failure wenn User nicht gefunden wurde
+#	return JSON-String name bei Erfolg
 @user_api.route('/user/<int:id>/name', methods=['GET'])
 def get_user_name(id):
 
@@ -113,7 +130,10 @@ def get_user_name(id):
 
     return jsonify({'name':user.name})
 
-
+# Liefert die ID des aktuellen Arbeitsplatzes der dem User zugeordnet 
+# ist als JSON-String zureck.
+#	return JSON-String failure wenn User nicht gefunden
+#	return JSON-String psid bei Erfolg
 @user_api.route('/user/<int:id>/psid', methods=['GET'])
 def get_user_psid(id):
 
@@ -125,7 +145,9 @@ def get_user_psid(id):
 
     return jsonify({'psid':user.psid})
 
-
+# Sets die ID psid des aktuellen Arbeitsplatzes des Users mit der ID id.
+#	return JSON-String failure wenn User nicht gefunden
+#	return JSON-String success wenn psid gesetzt wurde
 @user_api.route('/user/<int:id>/psid/<string:new_psid>', methods=['PUT'])
 def set_user_psid(id, new_psid):
 
@@ -142,6 +164,9 @@ def set_user_psid(id, new_psid):
     return jsonify({'success':f'user psid changed to {user.psid}'})
 
 
+# Gibt die Gruppen eines Users mit der ID id als String-String-List zurueck.
+#	return JSON-String-List wenn erfolgreich
+#	return JSON-String failure wenn User nicht gefunden wurde
 @user_api.route('/user/<int:id>/group', methods=['GET'])
 def get_user_group(id):
 
@@ -154,6 +179,9 @@ def get_user_group(id):
     return jsonify({'group':user.group_name})
 
 
+# Setzt die Gruppen new_group des Users mit der ID id.
+#	return JSON-String failure wenn User nicht gefunden
+#	return JSON-String success bei Erfolg
 @user_api.route('/user/<int:id>/group/<string:new_group>', methods=['PUT'])
 def set_user_group(id, new_group):
 
