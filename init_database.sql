@@ -23,7 +23,7 @@ CREATE TABLE groupname(
 
 
 INSERT INTO groupname (id, group_name, valid_psid) VALUES (0, "default", "{'psids':[56308]}");
-INSERT INTO groupname (id, group_name, valid_psid) VALUES (1, "all", "{'psids':[56308]}");
+INSERT INTO groupname (id, group_name, valid_psid) VALUES (1, "all", "{'psids':[56308, 61671, 56309, 61719, 61718, 61717, 61716, 61715, 61714, 61720]}");
 
 
 SELECT * FROM groupname;
